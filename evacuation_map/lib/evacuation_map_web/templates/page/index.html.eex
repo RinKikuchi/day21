@@ -1,0 +1,64 @@
+<div id="map"></div>
+
+<%= form_for @conn, Routes.page_path(@conn, :index), fn f -> %>
+  <%= select f, :city , @cities, prompt: "選択してください"%>
+  <%= submit "Search" %>
+<% end %>
+
+
+<section class="row">
+  <article class="column">
+  <strong>避難所名称</strong>
+  </article>
+  <article class="column">
+  <strong>地方公共団体コード</strong>
+  </article>
+  <article class="column">
+  <strong>都道府県</strong>
+  </article>
+  <article class="column">
+  <strong>市区町村</strong>
+  </article>
+  <article class="column">
+  <strong>住所</strong>
+  </article>
+</section>
+
+<%= for center <- @centers do%>
+<%= if center["指定区市町村名"] == @selected do %>
+<section class="row">
+  <article class="column">
+  <%= center["避難所_名称" ]%>
+  </article>
+  <article class="column">
+  <%= center["地方公共団体コード"] %>
+  </article>
+  <article class="column">
+ 　<%= center["都道府県"] %>
+  </article>
+  <article class="column">
+  <%= center["指定区市町村名"] %>
+  </article>
+  <article class="column">
+  <%= center["住所"] %>
+  </article>
+</section>
+<% end %>
+<% end %>
+
+
+<script>
+var map = L.map('map').setView([35.685344, 139.739763], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+<%= for center <- @centers do%>
+<%= if center["指定区市町村名"] == @selected do %>
+L.marker([<%= center["緯度"] %>, <%= center["経度"] %>]).addTo(map)
+    .bindPopup(' <%= center["避難所_名称"] %><br/><%= center["住所"] %>', {autoClose: false, closeOnClick: false})
+    .openPopup();
+<% end %>
+<% end %>
+</script>
