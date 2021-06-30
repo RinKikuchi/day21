@@ -5,6 +5,11 @@
   <%= submit "Search" %>
 <% end %>
 
+<%= form_for @conn, "/search", fn f -> %>
+  <%= text_input f, :address%>
+  <%= submit "Search" %>
+<% end %>
+
 
 <section class="row">
   <article class="column">
@@ -46,13 +51,48 @@
 <% end %>
 <% end %>
 
+<%= unless @searched == nil do %>
+<%= for center <- @centers do%>
+<%= if @searched =~ ~r/^#{center["指定区市町村名"]}.*/ do %>
+<section class="row">
+  <article class="column">
+  <%= center["避難所_名称" ]%>
+  </article>
+  <article class="column">
+  <%= center["地方公共団体コード"] %>
+  </article>
+  <article class="column">
+ 　<%= center["都道府県"] %>
+  </article>
+  <article class="column">
+  <%= center["指定区市町村名"] %>
+  </article>
+  <article class="column">
+  <%= center["住所"] %>
+  </article>
+</section>
+<% end %>
+<% end %>
+<% end %>
+
 
 <script>
-var map = L.map('map').setView([35.685344, 139.739763], 13);
+var map = L.map('map').setView([<%= @lat %>, <%= @lng%>], 13);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
+
+
+<%= unless @searched == nil do %>
+<%= for center <- @centers do%>
+<%= if @searched =~ ~r/^#{center["指定区市町村名"]}.*/ do %>
+L.marker([<%= center["緯度"] %>, <%= center["経度"] %>]).addTo(map)
+    .bindPopup(' <%= center["避難所_名称"] %><br/><%= center["住所"] %>', {autoClose: false, closeOnClick: false})
+    .openPopup();
+<% end %>
+<% end %>
+<% end %>
 
 <%= for center <- @centers do%>
 <%= if center["指定区市町村名"] == @selected do %>
@@ -61,4 +101,5 @@ L.marker([<%= center["緯度"] %>, <%= center["経度"] %>]).addTo(map)
     .openPopup();
 <% end %>
 <% end %>
+
 </script>

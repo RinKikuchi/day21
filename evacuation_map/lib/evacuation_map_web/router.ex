@@ -18,6 +18,8 @@ defmodule EvacuationMapWeb.Router do
 
     get "/", PageController, :index
     post "/", PageController, :index
+    get "/search", PageController, :push
+    post "/search", PageController, :push
   end
 
   # Other scopes may use custom stacks.
